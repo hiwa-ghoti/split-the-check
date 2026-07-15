@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web App Starter
 
-## Getting Started
+Next.js（App Router）+ TypeScript + Tailwind CSS の実用スターターひな型です。
 
-First, run the development server:
+## セットアップ
 
 ```bash
+cp .env.example .env.local
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) を開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ヘルスチェック: [http://localhost:3000/api/health](http://localhost:3000/api/health)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## スクリプト
 
-## Learn More
+| コマンド | 説明 |
+|----------|------|
+| `npm run dev` | 開発サーバー |
+| `npm run build` | 本番ビルド |
+| `npm run start` | 本番サーバー |
+| `npm run lint` | ESLint |
 
-To learn more about Next.js, take a look at the following resources:
+## ディレクトリ構成
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+src/
+  app/                 # ルーティング・ページ・API
+  components/
+    ui/                # 汎用 UI
+    layout/            # ヘッダー等
+  lib/                 # ロジック・env・ユーティリティ
+  types/               # 共有型
+  hooks/               # クライアントフック
+  data/                # モック・シード
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 環境変数
 
-## Deploy on Vercel
+`.env.example` を `.env.local` にコピーして使います。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| 変数 | 説明 |
+|------|------|
+| `NEXT_PUBLIC_APP_NAME` | アプリ表示名 |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+検証ロジックは `src/lib/env.ts` にあります。変数を増やしたら schema と `.env.example` の両方を更新してください。
+
+## 新機能の追加手順
+
+1. `src/types/` に型を定義する
+2. `src/lib/` にロジック・データ取得を置く（必要なら `src/data/` にモック）
+3. `src/app/` にページや `api/` Route を追加する
+4. UI は `src/components/ui/`（汎用）または `src/components/<domain>/`（固有）へ
+
+## AI 開発
+
+プロジェクトルールは [`.cursorrules`](.cursorrules) にあります。Cursor エージェント向けの共通方針です。
