@@ -1,6 +1,6 @@
-# Web App Starter
+# わりかん
 
-Next.js（App Router）+ TypeScript + Tailwind CSS の実用スターターひな型です。
+友達との飲み会・旅行などで「誰が何を払ったか」を記録し、精算（誰が誰にいくら渡すか）を自動で出すアプリです。
 
 ## セットアップ
 
@@ -12,7 +12,14 @@ npm run dev
 
 [http://localhost:3000](http://localhost:3000) を開きます。
 
-ヘルスチェック: [http://localhost:3000/api/health](http://localhost:3000/api/health)
+## 使い方
+
+1. イベント（飲み会など）を作成する
+2. メンバーを追加する
+3. 支払い（誰が・いくら・対象者）を記録する
+4. 精算結果の送金メモを見てやり取りする
+
+データはブラウザの localStorage に保存されます（この端末のみ）。
 
 ## スクリプト
 
@@ -31,29 +38,8 @@ src/
   components/
     ui/                # 汎用 UI
     layout/            # ヘッダー等
-  lib/                 # ロジック・env・ユーティリティ
+    warikan/           # 割り勘 UI
+  lib/warikan/         # 精算ロジック・保存
   types/               # 共有型
   hooks/               # クライアントフック
-  data/                # モック・シード
 ```
-
-## 環境変数
-
-`.env.example` を `.env.local` にコピーして使います。
-
-| 変数 | 説明 |
-|------|------|
-| `NEXT_PUBLIC_APP_NAME` | アプリ表示名 |
-
-検証ロジックは `src/lib/env.ts` にあります。変数を増やしたら schema と `.env.example` の両方を更新してください。
-
-## 新機能の追加手順
-
-1. `src/types/` に型を定義する
-2. `src/lib/` にロジック・データ取得を置く（必要なら `src/data/` にモック）
-3. `src/app/` にページや `api/` Route を追加する
-4. UI は `src/components/ui/`（汎用）または `src/components/<domain>/`（固有）へ
-
-## AI 開発
-
-プロジェクトルールは [`.cursorrules`](.cursorrules) にあります。Cursor エージェント向けの共通方針です。

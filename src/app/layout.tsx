@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: env.NEXT_PUBLIC_APP_NAME,
-  description: "Next.js + TypeScript Web アプリの実用スターターひな型",
+  description: "友達との支払いを記録して、割り勘の精算を自動で出すアプリ",
 };
 
 export default function RootLayout({
