@@ -2,12 +2,9 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
+import { useSearchParams } from "next/navigation";
 import { SessionDetail } from "@/components/warikan/session-detail";
 import { useWarikanStore } from "@/hooks/use-warikan-store";
-
-type SessionClientProps = {
-  sessionId: string;
-};
 
 function useHasHydrated(): boolean {
   return useSyncExternalStore(
@@ -17,10 +14,11 @@ function useHasHydrated(): boolean {
   );
 }
 
-export function SessionClient({ sessionId }: SessionClientProps) {
+export function SessionClient() {
+  const sessionId = useSearchParams().get("id");
   const hydrated = useHasHydrated();
   const store = useWarikanStore();
-  const session = store.getSession(sessionId);
+  const session = sessionId ? store.getSession(sessionId) : undefined;
 
   if (!hydrated) {
     return (
@@ -30,7 +28,7 @@ export function SessionClient({ sessionId }: SessionClientProps) {
     );
   }
 
-  if (!session) {
+  if (!sessionId || !session) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">

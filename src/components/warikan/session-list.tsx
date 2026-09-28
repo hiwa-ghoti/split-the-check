@@ -22,7 +22,7 @@ export function SessionList({ sessions, onCreate, onDelete }: SessionListProps) 
     event.preventDefault();
     const session = onCreate(title);
     setTitle("");
-    router.push(`/sessions/${session.id}`);
+    router.push(`/sessions?id=${encodeURIComponent(session.id)}`);
   }
 
   return (
@@ -63,7 +63,9 @@ export function SessionList({ sessions, onCreate, onDelete }: SessionListProps) 
                   <button
                     type="button"
                     className="min-w-0 flex-1 text-left"
-                    onClick={() => router.push(`/sessions/${session.id}`)}
+                    onClick={() =>
+                      router.push(`/sessions?id=${encodeURIComponent(session.id)}`)
+                    }
                   >
                     <p className="truncate font-medium tracking-tight">
                       {session.title}
@@ -79,7 +81,9 @@ export function SessionList({ sessions, onCreate, onDelete }: SessionListProps) 
                       type="button"
                       variant="secondary"
                       size="sm"
-                      onClick={() => router.push(`/sessions/${session.id}`)}
+                      onClick={() =>
+                        router.push(`/sessions?id=${encodeURIComponent(session.id)}`)
+                      }
                     >
                       開く
                     </Button>

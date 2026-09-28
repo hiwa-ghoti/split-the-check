@@ -30,6 +30,14 @@ npm run dev
 | `npm run start` | 本番サーバー |
 | `npm run lint` | ESLint |
 
+## GitHub Pages
+
+`main` ブランチへプッシュすると、GitHub Actionsがテスト・Lint・静的ビルドを実行し、GitHub Pagesへデプロイします。
+
+- 公開URL: <https://hiwa-ghoti.github.io/split-the-check/>
+- イベント詳細は静的ホスティングに対応するため `/sessions?id=...` 形式です。
+- データはこれまでどおりブラウザのlocalStorageに保存されます。
+
 ## ディレクトリ構成
 
 ```text
