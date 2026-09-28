@@ -1,5 +1,4 @@
 import type {
-  Member,
   MemberBalance,
   Session,
   Settlement,
@@ -22,6 +21,8 @@ export function splitAmount(amount: number, participantCount: number): number[] 
 export function calculateSettlement(session: Session): Settlement {
   const paid = new Map<string, number>();
   const share = new Map<string, number>();
+  const nameById = new Map(session.members.map((member) => [member.id, member.name]));
+  const transfers: Transfer[] = [];
 
   for (const member of session.members) {
     paid.set(member.id, 0);
@@ -31,10 +32,13 @@ export function calculateSettlement(session: Session): Settlement {
   let totalAmount = 0;
 
   for (const expense of session.expenses) {
-    if (expense.amount <= 0 || expense.participantIds.length === 0) continue;
+    if (!Number.isSafeInteger(expense.amount) || expense.amount <= 0) continue;
+    if (expense.participantIds.length === 0) continue;
     if (!paid.has(expense.paidById)) continue;
 
-    const participants = expense.participantIds.filter((id) => share.has(id));
+    const participants = [
+      ...new Set(expense.participantIds.filter((id) => share.has(id))),
+    ];
     if (participants.length === 0) continue;
 
     totalAmount += expense.amount;
@@ -42,7 +46,20 @@ export function calculateSettlement(session: Session): Settlement {
 
     const parts = splitAmount(expense.amount, participants.length);
     participants.forEach((id, index) => {
-      share.set(id, (share.get(id) ?? 0) + parts[index]!);
+      const amount = parts[index]!;
+      share.set(id, (share.get(id) ?? 0) + amount);
+
+      if (id !== expense.paidById && amount > 0) {
+        transfers.push({
+          expenseId: expense.id,
+          expenseTitle: expense.title,
+          fromId: id,
+          fromName: nameById.get(id) ?? id,
+          toId: expense.paidById,
+          toName: nameById.get(expense.paidById) ?? expense.paidById,
+          amount,
+        });
+      }
     });
   }
 
@@ -61,51 +78,6 @@ export function calculateSettlement(session: Session): Settlement {
   return {
     totalAmount,
     balances,
-    transfers: buildTransfers(balances, session.members),
+    transfers,
   };
-}
-
-function buildTransfers(
-  balances: MemberBalance[],
-  members: Member[],
-): Transfer[] {
-  const nameById = new Map(members.map((member) => [member.id, member.name]));
-
-  const debtors = balances
-    .filter((b) => b.net < 0)
-    .map((b) => ({ id: b.memberId, amount: -b.net }))
-    .sort((a, b) => b.amount - a.amount);
-
-  const creditors = balances
-    .filter((b) => b.net > 0)
-    .map((b) => ({ id: b.memberId, amount: b.net }))
-    .sort((a, b) => b.amount - a.amount);
-
-  const transfers: Transfer[] = [];
-  let i = 0;
-  let j = 0;
-
-  while (i < debtors.length && j < creditors.length) {
-    const debtor = debtors[i]!;
-    const creditor = creditors[j]!;
-    const amount = Math.min(debtor.amount, creditor.amount);
-
-    if (amount > 0) {
-      transfers.push({
-        fromId: debtor.id,
-        fromName: nameById.get(debtor.id) ?? debtor.id,
-        toId: creditor.id,
-        toName: nameById.get(creditor.id) ?? creditor.id,
-        amount,
-      });
-    }
-
-    debtor.amount -= amount;
-    creditor.amount -= amount;
-
-    if (debtor.amount === 0) i += 1;
-    if (creditor.amount === 0) j += 1;
-  }
-
-  return transfers;
 }

@@ -219,7 +219,7 @@ export function SessionDetail({
       <section className="rounded-2xl border border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white p-5 dark:border-teal-900/60 dark:from-teal-950/40 dark:to-zinc-950">
         <h2 className="text-sm font-semibold tracking-tight">精算結果</h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          誰が誰にいくら渡せばよいかをまとめます。
+          支払いごとに、誰が支払者へいくら渡すかをまとめます。
         </p>
 
         {session.members.length === 0 || session.expenses.length === 0 ? (
@@ -262,7 +262,7 @@ export function SessionDetail({
 
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                送金メモ
+                送金メモ（支払いごと）
               </h3>
               {settlement.transfers.length === 0 ? (
                 <p className="mt-2 text-sm text-teal-800 dark:text-teal-300">
@@ -272,15 +272,20 @@ export function SessionDetail({
                 <ul className="mt-2 space-y-2">
                   {settlement.transfers.map((transfer) => (
                     <li
-                      key={`${transfer.fromId}-${transfer.toId}-${transfer.amount}`}
+                      key={`${transfer.expenseId}-${transfer.fromId}-${transfer.toId}`}
                       className="rounded-lg bg-white/80 px-3 py-3 text-sm dark:bg-zinc-950/60"
                     >
-                      <span className="font-medium">{transfer.fromName}</span>
-                      <span className="mx-2 text-zinc-400">→</span>
-                      <span className="font-medium">{transfer.toName}</span>
-                      <span className="ml-2 font-semibold tabular-nums text-teal-800 dark:text-teal-300">
-                        {formatYen(transfer.amount)}
-                      </span>
+                      <p className="mb-1 text-xs text-zinc-500">
+                        {transfer.expenseTitle}の精算
+                      </p>
+                      <p>
+                        <span className="font-medium">{transfer.fromName}</span>
+                        <span className="mx-2 text-zinc-400">→</span>
+                        <span className="font-medium">{transfer.toName}</span>
+                        <span className="ml-2 font-semibold tabular-nums text-teal-800 dark:text-teal-300">
+                          {formatYen(transfer.amount)}
+                        </span>
+                      </p>
                     </li>
                   ))}
                 </ul>
