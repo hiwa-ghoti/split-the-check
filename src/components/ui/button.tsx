@@ -21,7 +21,7 @@ export function Button({
         size === "md" && "h-10 px-4",
         size === "sm" && "h-8 px-3 text-xs",
         variant === "primary" &&
-          "bg-teal-700 text-white hover:bg-teal-800 dark:bg-teal-500 dark:text-teal-950 dark:hover:bg-teal-400",
+          "bg-blue-700 text-white hover:bg-blue-800 dark:bg-blue-500 dark:text-blue-950 dark:hover:bg-blue-400",
         variant === "secondary" &&
           "border border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:bg-zinc-900",
         variant === "danger" &&

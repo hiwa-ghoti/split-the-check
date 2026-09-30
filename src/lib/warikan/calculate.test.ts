@@ -130,7 +130,7 @@ test("calculateSettlement: 支払者が割り勘対象外でも精算できる",
   assertBalanced(result);
 });
 
-test("calculateSettlement: 複数の支払いを相殺せず個別に精算する", () => {
+test("calculateSettlement: 同じ二人の支払いを相殺してまとめる", () => {
   const result = calculateSettlement(
     session([
       expense(120, "a", ["a", "b", "c"], "first"),
@@ -143,9 +143,8 @@ test("calculateSettlement: 複数の支払いを相殺せず個別に精算す�
   assert.deepEqual(
     result.transfers.map(({ fromId, toId, amount }) => ({ fromId, toId, amount })),
     [
-      { fromId: "b", toId: "a", amount: 40 },
+      { fromId: "b", toId: "a", amount: 10 },
       { fromId: "c", toId: "a", amount: 40 },
-      { fromId: "a", toId: "b", amount: 30 },
       { fromId: "b", toId: "c", amount: 25 },
     ],
   );
@@ -181,11 +180,28 @@ test("calculateSettlement: Aが9000円、Bが1200円を3人分払い、Cは両�
       amount,
     })),
     [
-      { fromId: "b", toId: "a", amount: 3000 },
+      { fromId: "b", toId: "a", amount: 2600 },
       { fromId: "c", toId: "a", amount: 3000 },
-      { fromId: "a", toId: "b", amount: 400 },
       { fromId: "c", toId: "b", amount: 400 },
     ],
+  );
+  assertBalanced(result);
+});
+
+test("calculateSettlement: A→B 300円とB→A 3000円をB→A 2700円にまとめる", () => {
+  const result = calculateSettlement(
+    session(
+      [
+        expense(600, "b", ["a", "b"], "paid-by-b"),
+        expense(6000, "a", ["a", "b"], "paid-by-a"),
+      ],
+      members.slice(0, 2),
+    ),
+  );
+
+  assert.deepEqual(
+    result.transfers.map(({ fromId, toId, amount }) => ({ fromId, toId, amount })),
+    [{ fromId: "b", toId: "a", amount: 2700 }],
   );
   assertBalanced(result);
 });

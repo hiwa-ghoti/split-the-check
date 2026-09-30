@@ -36,7 +36,7 @@ export function SessionClient() {
         </p>
         <Link
           href="/"
-          className="inline-flex text-sm text-teal-700 hover:underline dark:text-teal-400"
+          className="inline-flex text-sm text-blue-700 hover:underline dark:text-blue-400"
         >
           ← イベント一覧へ
         </Link>
@@ -52,6 +52,9 @@ export function SessionClient() {
       onRemoveMember={(memberId) => store.removeMember(sessionId, memberId)}
       onAddExpense={(input) => store.addExpense(sessionId, input)}
       onRemoveExpense={(expenseId) => store.removeExpense(sessionId, expenseId)}
+      onToggleTransferSettled={(transferKey) =>
+        store.toggleTransferSettled(sessionId, transferKey)
+      }
     />
   );
 }

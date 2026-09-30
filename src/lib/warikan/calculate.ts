@@ -22,7 +22,7 @@ export function calculateSettlement(session: Session): Settlement {
   const paid = new Map<string, number>();
   const share = new Map<string, number>();
   const nameById = new Map(session.members.map((member) => [member.id, member.name]));
-  const transfers: Transfer[] = [];
+  const transferAmounts = new Map<string, number>();
 
   for (const member of session.members) {
     paid.set(member.id, 0);
@@ -50,15 +50,13 @@ export function calculateSettlement(session: Session): Settlement {
       share.set(id, (share.get(id) ?? 0) + amount);
 
       if (id !== expense.paidById && amount > 0) {
-        transfers.push({
-          expenseId: expense.id,
-          expenseTitle: expense.title,
-          fromId: id,
-          fromName: nameById.get(id) ?? id,
-          toId: expense.paidById,
-          toName: nameById.get(expense.paidById) ?? expense.paidById,
-          amount,
-        });
+        const [firstId, secondId] = [id, expense.paidById].sort();
+        const pairKey = `${firstId}\u0000${secondId}`;
+        const signedAmount = id === firstId ? amount : -amount;
+        transferAmounts.set(
+          pairKey,
+          (transferAmounts.get(pairKey) ?? 0) + signedAmount,
+        );
       }
     });
   }
@@ -75,9 +73,28 @@ export function calculateSettlement(session: Session): Settlement {
     };
   });
 
+  const transfers: Transfer[] = [];
+  for (const [pairKey, signedAmount] of transferAmounts) {
+    if (signedAmount === 0) continue;
+    const [firstId, secondId] = pairKey.split("\u0000");
+    const fromId = signedAmount > 0 ? firstId! : secondId!;
+    const toId = signedAmount > 0 ? secondId! : firstId!;
+    transfers.push({
+      fromId,
+      fromName: nameById.get(fromId) ?? fromId,
+      toId,
+      toName: nameById.get(toId) ?? toId,
+      amount: Math.abs(signedAmount),
+    });
+  }
+
   return {
     totalAmount,
     balances,
     transfers,
   };
+}
+
+export function getTransferKey(transfer: Transfer): string {
+  return `${transfer.fromId}:${transfer.toId}:${transfer.amount}`;
 }

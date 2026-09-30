@@ -18,6 +18,7 @@ export interface Session {
   createdAt: string;
   members: Member[];
   expenses: Expense[];
+  settledTransferKeys?: string[];
 }
 
 export interface MemberBalance {
@@ -29,8 +30,6 @@ export interface MemberBalance {
 }
 
 export interface Transfer {
-  expenseId: string;
-  expenseTitle: string;
   fromId: string;
   fromName: string;
   toId: string;

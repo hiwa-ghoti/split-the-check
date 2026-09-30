@@ -1,46 +1,35 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { formatDate, formatYen } from "@/lib/warikan/format";
 import { calculateSettlement } from "@/lib/warikan/calculate";
 import type { Session } from "@/types/warikan";
 
 type SessionListProps = {
   sessions: Session[];
-  onCreate: (title: string) => Session;
+  onCreate: () => Session;
   onDelete: (sessionId: string) => void;
 };
 
 export function SessionList({ sessions, onCreate, onDelete }: SessionListProps) {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-
   function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const session = onCreate(title);
-    setTitle("");
+    const session = onCreate();
     router.push(`/sessions?id=${encodeURIComponent(session.id)}`);
   }
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-2xl border border-teal-200/70 bg-white/80 p-5 shadow-sm dark:border-teal-900/50 dark:bg-zinc-950/60">
+    <div className="space-y-12">
+      <section className="rounded-2xl border-2 border-[#dbe7ff] bg-[#eef4ff]/70 p-5 dark:border-blue-950 dark:bg-zinc-950/60">
         <h2 className="text-sm font-semibold tracking-tight">新しいイベント</h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          飲み会や旅行など、割り勘したい集まりを作ってください。
+          今日の支払いを記録するイベントを開きます。
         </p>
-        <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <Input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="例: 7/17 飲み会"
-            aria-label="イベント名"
-          />
-          <Button type="submit" className="shrink-0 sm:w-auto">
-            作成する
+        <form onSubmit={handleCreate} className="mt-4">
+          <Button type="submit">
+            今日のイベントを開く
           </Button>
         </form>
       </section>
@@ -58,7 +47,7 @@ export function SessionList({ sessions, onCreate, onDelete }: SessionListProps) 
               return (
                 <li
                   key={session.id}
-                  className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white/90 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-950/70"
+                  className="flex flex-col gap-3 rounded-xl border-2 border-[#e5edff] bg-white/65 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-950/70"
                 >
                   <button
                     type="button"

@@ -6,6 +6,7 @@ import { loadSessions, saveSessions } from "@/lib/warikan/storage";
 import type { Expense, Member, Session } from "@/types/warikan";
 
 let memorySessions: Session[] | null = null;
+const serverSessions: Session[] = [];
 const listeners = new Set<() => void>();
 
 function getClientSessions(): Session[] {
@@ -16,7 +17,7 @@ function getClientSessions(): Session[] {
 }
 
 function getServerSessions(): Session[] {
-  return [];
+  return serverSessions;
 }
 
 function subscribe(listener: () => void): () => void {
@@ -46,13 +47,31 @@ export function useWarikanStore() {
     getServerSessions,
   );
 
-  function createSession(title: string): Session {
+  function createSession(): Session {
+    const now = new Date();
+    const existingSession = getClientSessions().find((session) => {
+      const createdAt = new Date(session.createdAt);
+      return (
+        !Number.isNaN(createdAt.getTime()) &&
+        createdAt.getFullYear() === now.getFullYear() &&
+        createdAt.getMonth() === now.getMonth() &&
+        createdAt.getDate() === now.getDate()
+      );
+    });
+
+    if (existingSession) return existingSession;
+
     const session: Session = {
       id: createId("session"),
-      title: title.trim() || "無題のイベント",
-      createdAt: new Date().toISOString(),
+      title: new Intl.DateTimeFormat("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(now),
+      createdAt: now.toISOString(),
       members: [],
       expenses: [],
+      settledTransferKeys: [],
     };
     commit([session, ...getClientSessions()]);
     return session;
@@ -154,6 +173,18 @@ export function useWarikanStore() {
     }));
   }
 
+  function toggleTransferSettled(sessionId: string, transferKey: string) {
+    updateSession(sessionId, (session) => {
+      const settled = session.settledTransferKeys ?? [];
+      return {
+        ...session,
+        settledTransferKeys: settled.includes(transferKey)
+          ? settled.filter((key) => key !== transferKey)
+          : [...settled, transferKey],
+      };
+    });
+  }
+
   function getSession(sessionId: string): Session | undefined {
     return sessions.find((session) => session.id === sessionId);
   }
@@ -168,6 +199,7 @@ export function useWarikanStore() {
     removeMember,
     addExpense,
     removeExpense,
+    toggleTransferSettled,
     getSession,
   };
 }
